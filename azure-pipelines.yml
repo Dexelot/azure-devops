@@ -1,19 +1,25 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-latest'
+
+variables:
+  location: 'westeurope'
+  resourceGroupName: 'rg-from-pipeline'
+  storageAccountName: 'storacctpipeline123'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Subscription'
+    azureResourceManagerConnection: 'PIPELINE-DEPLOY'  # Replace this
+    subscriptionId: '7b427448-867e-4f5c-8c16-c37f1ff70272'                            # Replace this
+    location: '$(location)'
+    templateLocation: 'Linked artifact'
+    csmFile: 'mainTemplate.json'
+    deploymentMode: 'Incremental'
+    parameters: |
+      -resourceGroupName "$(resourceGroupName)"
+      -location "$(location)"
+      -storageAccountName "$(storageAccountName)"
